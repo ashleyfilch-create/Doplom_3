@@ -14,28 +14,29 @@ public class MainPage extends BasePage {
 
     public MainPage(WebDriver driver) {
         super(driver);
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     private By loginButton = By.xpath(".//button[text()='Войти в аккаунт']");
     private By personalAccount = By.xpath(".//p[text()='Личный Кабинет']");
     private By constructorHeader = By.xpath(".//h1[text()='Соберите бургер']");
+    private By profileButton = By.xpath(".//p[text()='Личный Кабинет']");
+    private By orderButton = By.xpath(".//button[text()='Оформить заказ']");
 
     @Step("Click Login button")
     public LoginPage clickLoginButton() {
-        driver.findElement(loginButton).click();
+        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
         return new LoginPage(driver);
     }
 
     @Step("Click Personal Account button")
     public LoginPage clickPersonalAccount() {
-        driver.findElement(personalAccount).click();
+        wait.until(ExpectedConditions.elementToBeClickable(personalAccount)).click();
         return new LoginPage(driver);
     }
 
-    @Step("Check Main page is loaded")
-    public boolean isLoaded() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(constructorHeader));
-        return driver.findElement(constructorHeader).isDisplayed();
+    @Step("Check user is logged in")
+    public boolean isLoggedIn() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(orderButton)).isDisplayed();
     }
 }
