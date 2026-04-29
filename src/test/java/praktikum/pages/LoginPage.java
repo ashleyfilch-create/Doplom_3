@@ -17,7 +17,6 @@ public class LoginPage extends BasePage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    // локаторы
     private By emailField = By.xpath(".//input[contains(@name,'name') or @type='email']");
     private By passwordField = By.xpath(".//input[@type='password' or @name='Пароль']");
     private By loginButton = By.xpath(".//button[contains(text(),'Войти')]");

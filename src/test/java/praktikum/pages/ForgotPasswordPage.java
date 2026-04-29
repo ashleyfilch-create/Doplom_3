@@ -18,7 +18,6 @@ public class ForgotPasswordPage extends BasePage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    // ===== STEP 1 =====
     private final By emailInput =
             By.xpath("//input[@type='email' or @type='text' or contains(@placeholder,'Email')]");
 
@@ -35,7 +34,6 @@ public class ForgotPasswordPage extends BasePage {
     private final By saveButton =
             By.xpath("//button[contains(text(),'Сохран')]");
 
-    // ---------------- STEP 1 ----------------
 
     @Step("Enter email")
     public ForgotPasswordPage enterEmail(String email) {
@@ -55,14 +53,12 @@ public class ForgotPasswordPage extends BasePage {
 
         wait.until(ExpectedConditions.elementToBeClickable(recoverButton)).click();
 
-        // 🔥 SPA FIX: ждём переход на STEP 2
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(passwordInput));
         wait.until(ExpectedConditions.visibilityOfElementLocated(codeInput));
 
         return this;
     }
-
-    // ---------------- STEP 2 ----------------
 
     @Step("Enter password")
     public ForgotPasswordPage enterPassword(String password) {
@@ -80,7 +76,6 @@ public class ForgotPasswordPage extends BasePage {
     @Step("Enter code")
     public ForgotPasswordPage enterCode(String code) {
 
-        // 🔥 FIX: SPA-safe (без clickable, он ломается на анимациях)
         WebElement input = wait.until(
                 ExpectedConditions.visibilityOfElementLocated(codeInput)
         );

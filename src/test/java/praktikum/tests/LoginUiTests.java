@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import praktikum.BaseTestUi;
 import praktikum.constants.ApiConstants;
+import praktikum.models.RegisterUserRequest;
 import praktikum.pages.ForgotPasswordPage;
 import praktikum.pages.LoginPage;
 import praktikum.pages.MainPage;
@@ -29,10 +30,13 @@ public class LoginUiTests extends BaseTestUi {
         email = "user_" + System.currentTimeMillis() + "@test.com";
         password = "123456";
 
+        RegisterUserRequest request =
+                new RegisterUserRequest(email, password, "testUser");
+
         Response response =
                 given()
                         .header(ApiConstants.CONTENT_TYPE, ApiConstants.APPLICATION_JSON)
-                        .body("{\"email\":\"" + email + "\", \"password\":\"" + password + "\", \"name\":\"testUser\"}")
+                        .body(request)
                         .when()
                         .post(ApiConstants.BASE_URL + ApiConstants.REGISTER);
 
@@ -101,7 +105,7 @@ public class LoginUiTests extends BaseTestUi {
         forgot.enterEmail(email)
                 .clickRecover()
                 .enterPassword(password)
-                .enterCode("1234") // ⚠️ лучше заменить на реальный код из API/email mock
+                .enterCode("1234")
                 .clickSave();
 
         Assert.assertTrue(new MainPage(driver).isLoggedIn());
