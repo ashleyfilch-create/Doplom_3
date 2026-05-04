@@ -10,18 +10,27 @@ import java.time.Duration;
 
 public class MainPage extends BasePage {
 
-    private WebDriverWait wait;
+    private final WebDriverWait wait;
 
     public MainPage(WebDriver driver) {
         super(driver);
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    private By loginButton = By.xpath(".//button[text()='Войти в аккаунт']");
-    private By personalAccount = By.xpath(".//p[text()='Личный Кабинет']");
-    private By constructorHeader = By.xpath(".//h1[text()='Соберите бургер']");
-    private By profileButton = By.xpath(".//p[text()='Личный Кабинет']");
-    private By orderButton = By.xpath(".//button[text()='Оформить заказ']");
+    private final By loginButton = By.xpath(".//button[text()='Войти в аккаунт']");
+    private final By personalAccount = By.xpath(".//p[text()='Личный Кабинет']");
+    private final By constructorHeader = By.xpath(".//h1[text()='Соберите бургер']");
+    private final By profileButton = By.xpath(".//p[text()='Личный Кабинет']");
+    private final By orderButton = By.xpath(".//button[text()='Оформить заказ']");
+
+    @Step("Проверка открытия главной страницы")
+    public boolean isOpened() {
+        try {
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(constructorHeader)).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     @Step("Click Login button")
     public LoginPage clickLoginButton() {
@@ -37,6 +46,10 @@ public class MainPage extends BasePage {
 
     @Step("Check user is logged in")
     public boolean isLoggedIn() {
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(orderButton)).isDisplayed();
+        try {
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(orderButton)).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

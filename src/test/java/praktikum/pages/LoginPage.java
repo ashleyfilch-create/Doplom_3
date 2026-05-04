@@ -12,57 +12,35 @@ public class LoginPage extends BasePage {
 
     private final WebDriverWait wait;
 
+    private final By emailField = By.xpath(".//label[text()='Email']/parent::div/input");
+    private final By passwordField = By.xpath(".//label[text()='Пароль']/parent::div/input");
+    private final By loginButton = By.xpath(".//button[text()='Войти']");
+    private final By forgotPasswordLink = By.xpath(".//a[text()='Восстановить пароль']");
+    private final By loginHeader = By.xpath(".//h2[text()='Вход']");
+
     public LoginPage(WebDriver driver) {
         super(driver);
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-    private By emailField = By.xpath(".//input[contains(@name,'name') or @type='email']");
-    private By passwordField = By.xpath(".//input[@type='password' or @name='Пароль']");
-    private By loginButton = By.xpath(".//button[contains(text(),'Войти')]");
-    private By registerLink = By.xpath(".//a[text()='Зарегистрироваться']");
-    private By forgotPasswordLink = By.xpath(".//a[text()='Восстановить пароль']");
-    private By primaryButton = By.xpath(
-            "//button[contains(@class,'button_button_type_primary')]"
-    );
+    @Step("Проверка открытия страницы логина")
+    public boolean isOpened() {
+        try {
+            return wait.until(ExpectedConditions.visibilityOfElementLocated(loginHeader)).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-    @Step("Login with email: {email}")
+    @Step("Авторизация пользователя: email {email}")
     public void login(String email, String password) {
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(emailField));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(passwordField));
-
-        driver.findElement(emailField).clear();
-        driver.findElement(emailField).sendKeys(email);
-
-        driver.findElement(passwordField).clear();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(emailField)).sendKeys(email);
         driver.findElement(passwordField).sendKeys(password);
-
-        wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
+        driver.findElement(loginButton).click();
     }
 
-    @Step("Enter email only: {email}")
-    public void enterEmail(String email) {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(emailField));
-
-        driver.findElement(emailField).clear();
-        driver.findElement(emailField).sendKeys(email);
-    }
-
-    @Step("Click primary action button")
-    public void clickPrimaryButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(primaryButton)).click();
-    }
-
-    @Step("Go to Register page")
-    public RegisterPage goToRegister() {
-        wait.until(ExpectedConditions.elementToBeClickable(registerLink)).click();
-        return new RegisterPage(driver);
-    }
-
-    @Step("Go to Forgot Password page")
-    public ForgotPasswordPage goToForgotPassword() {
+    @Step("Переход на страницу восстановления пароля")
+    public void goToForgotPassword() {
         wait.until(ExpectedConditions.elementToBeClickable(forgotPasswordLink)).click();
-        return new ForgotPasswordPage(driver);
     }
 }

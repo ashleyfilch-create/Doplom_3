@@ -1,48 +1,50 @@
 package praktikum.tests;
 
-import io.qameta.allure.*;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.junit4.DisplayName;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import praktikum.BaseTestUi;
+import praktikum.constants.ApiConstants;
 import praktikum.pages.ConstructorPage;
 
-@Epic("UI Tests")
-@Feature("Constructor")
+@Feature("Конструктор")
 public class ConstructorUiTests extends BaseTestUi {
 
-    @Test
-    @Story("Switch to sauces tab")
-    @Description("Проверяет, что при клике на вкладку 'Соусы' она становится активной")
-    public void shouldOpenSaucesTab() {
-        ConstructorPage constructor = new ConstructorPage(driver);
+    @Before
+    public void setUp() {
+        super.setUp();
+        driver.get(ApiConstants.BASE_URL);
+    }
 
+    @Test
+    @DisplayName("Переход к разделу 'Соусы'")
+    @Description("Проверяет, что при клике на 'Соусы' вкладка становится активной")
+    public void shouldSwitchToSauces() {
+        ConstructorPage constructor = new ConstructorPage(driver);
         constructor.clickSauces();
-
-        Assert.assertTrue("Sauces tab is not active",
-                constructor.isTabActive("Соусы"));
+        Assert.assertTrue("Вкладка 'Соусы' должна быть активной", constructor.isTabActive("Соусы"));
     }
 
     @Test
-    @Story("Switch to fillings tab")
-    @Description("Проверяет, что при клике на вкладку 'Начинки' она становится активной")
-    public void shouldOpenFillingsTab() {
+    @DisplayName("Переход к разделу 'Начинки'")
+    @Description("Проверяет, что при клике на 'Начинки' вкладка становится активной")
+    public void shouldSwitchToFillings() {
         ConstructorPage constructor = new ConstructorPage(driver);
-
         constructor.clickFillings();
-
-        Assert.assertTrue("Fillings tab is not active",
-                constructor.isTabActive("Начинки"));
+        Assert.assertTrue("Вкладка 'Начинки' должна быть активной", constructor.isTabActive("Начинки"));
     }
 
     @Test
-    @Story("Switch to buns tab")
-    @Description("Проверяет, что при клике на вкладку 'Булки' она становится активной")
-    public void shouldOpenBunsTab() {
+    @DisplayName("Переход к разделу 'Булки'")
+    @Description("Проверяет возврат к вкладке 'Булки' после другого раздела")
+    public void shouldSwitchToBuns() {
         ConstructorPage constructor = new ConstructorPage(driver);
-
+        constructor.clickSauces();
         constructor.clickBuns();
 
-        Assert.assertTrue("Buns tab is not active",
-                constructor.isTabActive("Булки"));
+        Assert.assertTrue("Вкладка 'Булки' должна быть активной", constructor.isTabActive("Булки"));
     }
 }

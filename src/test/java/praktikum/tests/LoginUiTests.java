@@ -1,7 +1,10 @@
 package praktikum.tests;
 
-import io.qameta.allure.*;
+import io.qameta.allure.Description;
+import io.qameta.allure.Feature;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -12,11 +15,11 @@ import praktikum.models.RegisterUserRequest;
 import praktikum.pages.ForgotPasswordPage;
 import praktikum.pages.LoginPage;
 import praktikum.pages.MainPage;
+import praktikum.pages.RegisterPage;
 
 import static io.restassured.RestAssured.given;
 
-@Epic("UI Tests")
-@Feature("Login")
+@Feature("Авторизация пользователя")
 public class LoginUiTests extends BaseTestUi {
 
     private String email;
@@ -28,19 +31,19 @@ public class LoginUiTests extends BaseTestUi {
         super.setUp();
 
         email = "user_" + System.currentTimeMillis() + "@test.com";
-        password = "123456";
+        password = "password123";
 
-        RegisterUserRequest request =
-                new RegisterUserRequest(email, password, "testUser");
+        RegisterUserRequest request = new RegisterUserRequest(email, password, "testUser");
 
-        Response response =
-                given()
-                        .header(ApiConstants.CONTENT_TYPE, ApiConstants.APPLICATION_JSON)
-                        .body(request)
-                        .when()
-                        .post(ApiConstants.BASE_URL + ApiConstants.REGISTER);
+        Response response = given()
+                .header(ApiConstants.CONTENT_TYPE, ApiConstants.APPLICATION_JSON)
+                .body(request)
+                .when()
+                .post(ApiConstants.BASE_URL + ApiConstants.REGISTER);
 
-        accessToken = response.jsonPath().getString("accessToken");
+        if (response.getStatusCode() == HttpStatus.SC_OK || response.getStatusCode() == HttpStatus.SC_CREATED) {
+            accessToken = response.jsonPath().getString("accessToken");
+        }
     }
 
     @After
@@ -49,65 +52,68 @@ public class LoginUiTests extends BaseTestUi {
             given()
                     .header(ApiConstants.AUTH, accessToken)
                     .when()
-                    .delete(ApiConstants.BASE_URL + ApiConstants.USER);
+                    .delete(ApiConstants.BASE_URL + ApiConstants.USER)
+                    .then()
+                    .statusCode(HttpStatus.SC_ACCEPTED);
         }
-
         super.tearDown();
     }
 
     @Test
+    @DisplayName("Вход по кнопке 'Войти в аккаунт' на главной")
+    @Description("Проверка успешной авторизации через кнопку на главном экране")
     public void shouldLoginViaMainPage() {
-
+        driver.get(ApiConstants.BASE_URL);
         MainPage main = new MainPage(driver);
         main.clickLoginButton();
 
         LoginPage login = new LoginPage(driver);
         login.login(email, password);
 
-        Assert.assertTrue(new MainPage(driver).isLoggedIn());
+        Assert.assertTrue("Пользователь не авторизован через главную страницу", main.isLoggedIn());
     }
 
     @Test
+    @DisplayName("Вход через кнопку 'Личный кабинет'")
+    @Description("Проверка перехода к логину при попытке зайти в личный кабинет без авторизации")
     public void shouldLoginViaPersonalAccount() {
-
+        driver.get(ApiConstants.BASE_URL);
         MainPage main = new MainPage(driver);
         main.clickPersonalAccount();
 
         LoginPage login = new LoginPage(driver);
         login.login(email, password);
 
-        Assert.assertTrue(new MainPage(driver).isLoggedIn());
+        Assert.assertTrue("Пользователь не авторизован через Личный кабинет", main.isLoggedIn());
     }
 
     @Test
+    @DisplayName("Вход через ссылку в форме регистрации")
+    @Description("Проверка возможности перейти к логину со страницы регистрации")
     public void shouldLoginViaRegistrationForm() {
+        driver.get(ApiConstants.BASE_URL + "/register");
 
-        MainPage main = new MainPage(driver);
-        main.clickLoginButton();
+        RegisterPage register = new RegisterPage(driver);
+        register.clickLoginLink();
 
         LoginPage login = new LoginPage(driver);
         login.login(email, password);
 
-        Assert.assertTrue(new MainPage(driver).isLoggedIn());
+        Assert.assertTrue("Пользователь не авторизован через форму регистрации", new MainPage(driver).isLoggedIn());
     }
 
     @Test
-    public void shouldLoginViaForgotPassword() {
-
-        MainPage main = new MainPage(driver);
-        main.clickLoginButton();
-
-        LoginPage login = new LoginPage(driver);
-        login.goToForgotPassword();
+    @DisplayName("Вход через ссылку в форме восстановления пароля")
+    @Description("Проверка перехода к логину со страницы забытого пароля")
+    public void shouldLoginViaForgotPasswordPage() {
+        driver.get(ApiConstants.BASE_URL + "/forgot-password");
 
         ForgotPasswordPage forgot = new ForgotPasswordPage(driver);
+        forgot.clickLoginLink();
 
-        forgot.enterEmail(email)
-                .clickRecover()
-                .enterPassword(password)
-                .enterCode("1234")
-                .clickSave();
+        LoginPage login = new LoginPage(driver);
+        login.login(email, password);
 
-        Assert.assertTrue(new MainPage(driver).isLoggedIn());
+        Assert.assertTrue("Пользователь не авторизован через форму восстановления пароля", new MainPage(driver).isLoggedIn());
     }
 }

@@ -18,79 +18,53 @@ public class ForgotPasswordPage extends BasePage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    private final By emailInput =
-            By.xpath("//input[@type='email' or @type='text' or contains(@placeholder,'Email')]");
+    private final By emailInput = By.xpath(".//label[text()='Email']/parent::div/input");
+    private final By recoverButton = By.xpath(".//button[text()='Восстановить']");
 
-    private final By recoverButton =
-            By.xpath("//button[contains(text(),'Восстанов')]");
+    private final By loginLink = By.xpath(".//a[text()='Войти']");
 
-    // ===== STEP 2 =====
-    private final By passwordInput =
-            By.xpath("//form//input[@type='password']");
+    private final By passwordInput = By.xpath(".//label[text()='Пароль']/parent::div/input");
+    private final By codeInput = By.xpath(".//label[text()='Введите код из письма']/parent::div/input");
+    private final By saveButton = By.xpath(".//button[text()='Сохранить']");
 
-    private final By codeInput =
-            By.xpath("//form//input[contains(@placeholder,'код') or contains(@name,'код') or contains(@placeholder,'Код')]");
+    @Step("Нажать на ссылку 'Войти'")
+    public void clickLoginLink() {
+        wait.until(ExpectedConditions.elementToBeClickable(loginLink)).click();
+    }
 
-    private final By saveButton =
-            By.xpath("//button[contains(text(),'Сохран')]");
-
-
-    @Step("Enter email")
+    @Step("Ввести email для восстановления")
     public ForgotPasswordPage enterEmail(String email) {
-
-        WebElement input = wait.until(
-                ExpectedConditions.elementToBeClickable(emailInput)
-        );
-
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(emailInput));
         input.clear();
         input.sendKeys(email);
-
         return this;
     }
 
-    @Step("Click recover button")
+    @Step("Нажать кнопку 'Восстановить'")
     public ForgotPasswordPage clickRecover() {
-
         wait.until(ExpectedConditions.elementToBeClickable(recoverButton)).click();
-
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(passwordInput));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(codeInput));
-
         return this;
     }
 
-    @Step("Enter password")
+    @Step("Ввести новый пароль")
     public ForgotPasswordPage enterPassword(String password) {
-
-        WebElement input = wait.until(
-                ExpectedConditions.elementToBeClickable(passwordInput)
-        );
-
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(passwordInput));
         input.clear();
         input.sendKeys(password);
-
         return this;
     }
 
-    @Step("Enter code")
+    @Step("Ввести код из письма")
     public ForgotPasswordPage enterCode(String code) {
-
-        WebElement input = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(codeInput)
-        );
-
-        wait.until(driver -> input.isDisplayed() && input.isEnabled());
-
+        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(codeInput));
         input.clear();
         input.sendKeys(code);
-
         return this;
     }
 
-    @Step("Click save")
+    @Step("Нажать кнопку 'Сохранить'")
     public void clickSave() {
-
         wait.until(ExpectedConditions.elementToBeClickable(saveButton)).click();
     }
 }
